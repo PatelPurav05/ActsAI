@@ -1,35 +1,44 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState } from "react";
+import { useQuery, useMutation } from "convex/react";
+import { Id } from "../convex/_generated/dataModel"; // Import Id type
+import { api } from "../convex/_generated/api";
+import ChatRoom from "./ChatRoom";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const rooms = useQuery(api.rooms.getRooms); // Fetch rooms
+  const createRoom = useMutation(api.rooms.createRoom); // Mutation to create a room
+  const [newRoomName, setNewRoomName] = useState<string>(""); // New room input
+  const [selectedRoom, setSelectedRoom] = useState<Id<"rooms"> | null>(null); // Selected room ID with proper type
+
+  // Handle room creation
+  const handleCreateRoom = async () => {
+    if (newRoomName) {
+      await createRoom({ roomName: newRoomName });
+      setNewRoomName("");
+    }
+  };
 
   return (
-    <>
+    <div className="App">
+      <h1>Chat Rooms</h1>
       <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        {rooms?.map((room) => (
+          <div key={room._id} onClick={() => setSelectedRoom(room._id)}>
+            {room.name}
+          </div>
+        ))}
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+
+      <input
+        value={newRoomName}
+        onChange={(e) => setNewRoomName(e.target.value)}
+        placeholder="New room name"
+      />
+      <button onClick={handleCreateRoom}>Create Room</button>
+
+      {selectedRoom && <ChatRoom roomId={selectedRoom} />}
+    </div>
+  );
 }
 
-export default App
+export default App;

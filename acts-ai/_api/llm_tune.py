@@ -3,7 +3,7 @@ import tempfile
 
 from modal import Image, method, enter
 
-from .common import stub
+from .common import app
 
 tune_image = (
     Image.debian_slim(python_version="3.10.8")  # , requirements_path=req)
@@ -12,7 +12,7 @@ tune_image = (
     )
 )
 
-@stub.cls(
+@app.cls(
     image=tune_image,
     container_idle_timeout=300,
     timeout=180,

@@ -2,8 +2,9 @@ import json
 from typing import List
 
 import requests
-from config import config
-from models import ChatCompletion
+
+from api.config import config
+from api.models import ChatCompletion
 
 
 def chat_completion(
@@ -20,7 +21,7 @@ def _send_receive_req(headers: dict, data: dict, stream: bool):
     response_msgs = []
     try:
         url = "https://proxy.tune.app/chat/completions"
-        response = requests.post(url, headers=headers, json=data)
+        response = requests.post(url, headers=headers, json=data, timeout=30)
         if stream:
             for line in response.iter_lines():
                 if line:
@@ -37,10 +38,12 @@ def _send_receive_req(headers: dict, data: dict, stream: bool):
 def _build_tune_request_data(system_context: str, user_question: str, stream: bool):
     """Build a request's headers and data for the TuneStudio API"""
     api_key = config.TUNE_STUDIO_API_KEY
+
     headers = {
         "Authorization": api_key,
         "Content-Type": "application/json",
     }
+
     data = {
         "temperature": 0.80,
         "messages": [
@@ -52,4 +55,5 @@ def _build_tune_request_data(system_context: str, user_question: str, stream: bo
         "penalty": 0,
         "max_tokens": 900,
     }
+
     return headers, data

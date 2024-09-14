@@ -7,7 +7,7 @@ load_dotenv()
 
 
 class Config(BaseSettings):
-    TUNE_STUDIO_API_KEY: str = os.getenv("TUNE_STUDIO_API_KEY")
+    TUNE_STUDIO_API_KEY = os.getenv("TUNE_STUDIO_API_KEY")
 
 
 config = Config()

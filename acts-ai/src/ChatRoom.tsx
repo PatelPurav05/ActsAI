@@ -1,55 +1,88 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../convex/_generated/api";
-import { Id } from "../convex/_generated/dataModel"; // Import Id type
+import { Id } from "../convex/_generated/dataModel";
+import { Box, Input, Button, VStack, Text, HStack, Flex } from "@chakra-ui/react";
+import { FiSend } from "react-icons/fi";
+import { motion } from "framer-motion";
 
 interface ChatRoomProps {
   roomId: Id<"rooms">;
 }
 
 const ChatRoom: React.FC<ChatRoomProps> = ({ roomId }) => {
-  const messages = useQuery(api.messages.getMessagesForRoom, { roomId }); // Fetch messages for the room
-  const sendMessage = useMutation(api.messages.sendMessage); // Mutation to send a message
-  const [newMessage, setNewMessage] = useState<string>(""); // New message input
+  const messages = useQuery(api.messages.getMessagesForRoom, { roomId });
+  const sendMessage = useMutation(api.messages.sendMessage);
+  const [newMessage, setNewMessage] = useState<string>("");
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   const handleSendMessage = async () => {
-    if (newMessage) {
-      await sendMessage({ roomId, body: newMessage, author: "User1" }); // Simulate a user ID
+    if (newMessage.trim()) {
+      await sendMessage({ roomId, body: newMessage, author: "User1" });
       setNewMessage("");
     }
   };
 
-  return (
-    <div className="bg-white shadow-md rounded-lg p-4">
-      <h2 className="text-2xl font-semibold mb-4">Chat Room</h2>
-      <div className="max-h-64 overflow-y-auto mb-4">
-        {messages?.map((message) => (
-          <div key={message._id} className="mb-2">
-            <strong className="text-blue-500">{message.author}:</strong>{" "}
-            <span className="text-black">{message.body}</span>
-            <br />
-            <small className="text-gray-500 text-sm">
-              {new Date(message._creationTime).toLocaleString()}
-            </small>
-          </div>
-        ))}
-      </div>
+  // Auto-scroll to bottom when messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
-      <div className="flex gap-2">
-        <input
+  return (
+    <Flex direction="column" h="100%" bg="gray.800" p={6} rounded="lg" shadow="md">
+      {/* Messages Section */}
+      <VStack
+        spacing={4}
+        overflowY="auto"
+        flexGrow={1}
+        bg="gray.900"
+        p={4}
+        rounded="lg"
+      >
+        {messages?.map((message) => (
+          <Box
+            key={message._id}
+            as={motion.div}
+            bg={message.author === "User1" ? "blue.500" : "gray.700"}
+            color="white"
+            p={3}
+            rounded="lg"
+            alignSelf={message.author === "User1" ? "flex-end" : "flex-start"}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <Text fontSize="sm" fontWeight="bold">
+              {message.author}
+            </Text>
+            <Text>{message.body}</Text>
+            <Text fontSize="xs" mt={1} color="gray.400">
+              {new Date(message._creationTime).toLocaleTimeString()}
+            </Text>
+          </Box>
+        ))}
+        <div ref={messagesEndRef} />
+      </VStack>
+
+      {/* Message Input Section */}
+      <HStack mt={4}>
+        <Input
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           placeholder="Type a message..."
-          className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-300"
+          bg="gray.700"
+          color="white"
+          rounded="lg"
+          focusBorderColor="blue.500"
         />
-        <button
+        <Button
+          colorScheme="blue"
           onClick={handleSendMessage}
-          className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-all"
+          rightIcon={<FiSend />}
         >
           Send
-        </button>
-      </div>
-    </div>
+        </Button>
+      </HStack>
+    </Flex>
   );
 };
 

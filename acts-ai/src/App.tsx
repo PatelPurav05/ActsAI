@@ -1,60 +1,69 @@
-import React, { useState } from "react";
-import { useQuery, useMutation } from "convex/react";
-import { Id } from "../convex/_generated/dataModel"; // Import Id type
+import React, { useState, useEffect } from "react";
+import { useQuery } from "convex/react";
+import { Id } from "../convex/_generated/dataModel";
 import { api } from "../convex/_generated/api";
 import ChatRoom from "./ChatRoom";
+import { Box, Button, Menu, MenuButton, MenuItem, MenuList, Flex, Text, VStack, HStack } from "@chakra-ui/react";
+import { ChevronDownIcon } from "@chakra-ui/icons";
 
 function App() {
   const rooms = useQuery(api.rooms.getRooms); // Fetch rooms
-  const createRoom = useMutation(api.rooms.createRoom); // Mutation to create a room
-  const [newRoomName, setNewRoomName] = useState<string>(""); // New room input
-  const [selectedRoom, setSelectedRoom] = useState<Id<"rooms"> | null>(null); // Selected room ID with proper type
+  const [selectedRoom, setSelectedRoom] = useState<Id<"rooms"> | null>(null);
+  const [selectedTherapist, setSelectedTherapist] = useState<string | null>(null);
 
-  const handleCreateRoom = async () => {
-    if (newRoomName) {
-      await createRoom({ roomName: newRoomName });
-      setNewRoomName("");
+  // Set the first room as the default selected room
+  useEffect(() => {
+    if (rooms && rooms.length > 0 && !selectedRoom) {
+      setSelectedRoom(rooms[0]._id);
+      setSelectedTherapist(rooms[0].therapist)
     }
-  };
+  }, [rooms, selectedRoom]);
 
   return (
-    <div className=" w-screen min-h-screen bg-gray-100 flex flex-col items-center">
-      <h1 className="text-4xl font-bold mt-8 mb-4 text-black">Chat Rooms</h1>
-      <div className="w-full max-w-md bg-white shadow-md rounded-lg p-4">
-        <ul className="mb-4">
-          {rooms?.map((room) => (
-            <li
-              key={room._id}
-              onClick={() => setSelectedRoom(room._id)}
-              className={`cursor-pointer p-2 rounded-md mb-2 text-lg ${
-                selectedRoom === room._id ? "bg-blue-500 text-black" : "bg-gray-200 text-black"
-              } hover:bg-blue-400 hover:text-black transition-all`}
-            >
-              {room.name}
-            </li>
-          ))}
-        </ul>
-        <div className="flex gap-2">
-          <input
-            value={newRoomName}
-            onChange={(e) => setNewRoomName(e.target.value)}
-            placeholder="New room name"
-            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-300"
-          />
-          <button
-            onClick={handleCreateRoom}
-            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-all"
-          >
-            Create
-          </button>
-        </div>
-      </div>
+    <div className="w-screen">
+    <Flex height="100vh" bg="gray.900">
+      {/* Left Side: Room Selection */}
+      <VStack
+        w="250px"
+        bg="gray.800"
+        p={4}
+        spacing={6}
+        shadow="lg"
+        align="start"
+      >
+        <Text fontSize="xl" fontWeight="bold" color="gray.200">
+          Therapists
+        </Text>
+        <Menu>
+          <MenuButton as={Button} rightIcon={<ChevronDownIcon />} colorScheme="blue" w="full">
+            {selectedTherapist ? `${selectedTherapist}` : "Select a Therapist"}
+          </MenuButton>
+          <MenuList bg="gray.800">
+            {rooms?.map((room) => (
+              <MenuItem
+                key={room._id}
+                onClick={() => setSelectedRoom(room._id)}
+                bg="gray.700"
+                _hover={{ bg: "blue.500", color: "white" }}
+              >
+                {room.name}
+              </MenuItem>
+            ))}
+          </MenuList>
+        </Menu>
+      </VStack>
 
-      {selectedRoom && (
-        <div className="w-full max-w-md mt-8">
+      {/* Right Side: Chat Room */}
+      <Flex flexGrow={1} p={6} direction="column">
+        {selectedRoom ? (
           <ChatRoom roomId={selectedRoom} />
-        </div>
-      )}
+        ) : (
+          <Text mt={4} textAlign="center" fontSize="xl" color="gray.300">
+            Please select a room to start chatting.
+          </Text>
+        )}
+      </Flex>
+    </Flex>
     </div>
   );
 }

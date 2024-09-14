@@ -12,7 +12,7 @@ import tempfile
 
 from modal import Image, method, enter
 
-from .common import stub
+from .common import app
 
 
 def download_models():
@@ -39,7 +39,7 @@ tortoise_image = (
 )
 
 
-@stub.cls(
+@app.cls(
     image=tortoise_image,
     gpu="A10G",
     container_idle_timeout=300,

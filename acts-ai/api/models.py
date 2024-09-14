@@ -1,33 +1,34 @@
 from enum import Enum
-from typing import List
 
-from pydantic import BaseModel
+# from typing import List
 
-
-class Message(BaseModel):
-    role: str
-    content: str
+# from pydantic import BaseModel
 
 
-class Choice(BaseModel):
-    index: int
-    message: Message
-    finish_reason: str
+# class Message(BaseModel):
+#     role: str
+#     content: str
 
 
-class Usage(BaseModel):
-    prompt_tokens: int
-    completion_tokens: int
-    total_tokens: int
+# class Choice(BaseModel):
+#     index: int
+#     message: Message
+#     finish_reason: str
 
 
-class ChatCompletion(BaseModel):
-    id: str
-    object: str
-    created: int
-    model: str
-    usage: Usage
-    choices: List[Choice]
+# class Usage(BaseModel):
+#     prompt_tokens: int
+#     completion_tokens: int
+#     total_tokens: int
+
+
+# class ChatCompletion(BaseModel):
+#     id: str
+#     object: str
+#     created: int
+#     model: str
+#     usage: Usage
+#     choices: List[Choice]
 
 
 # This should match 'INTENT_DETECTOR' prompt in prompts.py
@@ -37,5 +38,5 @@ class Intent(Enum):
     THERAPIST_REQUEST = "THERAPIST_REQUEST"
 
 
-class DetectedIntent(BaseModel):
-    intent: Intent
+# class DetectedIntent(BaseModel):
+#     intent: Intent

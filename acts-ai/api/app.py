@@ -6,38 +6,41 @@ API routes for [functionality].
 import json
 
 import modal
-from models import DetectedIntent, Intent
+import requests
+from models import Intent
 from prompts import INTENT_DETECTOR
 from tune import chat_completion
 
-app = modal.App("example-hello-world")
+image = modal.Image.debian_slim().pip_install(["requests", "python-dotenv"])
+app = modal.App(
+    "example-hello-world", image=image, secrets=[modal.Secret.from_name("hackmit")]
+)
 
 
-@app.function(secrets=[modal.Secret.from_name("hackmit")])
-def intent(context: str) -> DetectedIntent:
+@app.function()
+def intent(context: str) -> dict:
     """Detects which predefined intent context falls into."""
     res = chat_completion(
         system_context=INTENT_DETECTOR, user_question=context, stream=False
     )
-    detected_intent = res[0].choices[0].message.content
+    detected_intent = res[0].get("choices")[0].get("message").get("content")
     formatted_detected_intent = json.loads(detected_intent)
-    typed_detected_intent = DetectedIntent(**formatted_detected_intent)
-    return typed_detected_intent
+    return formatted_detected_intent
 
 
-@app.function(secrets=[modal.Secret.from_name("hackmit")])
+@app.function()
+@modal.web_endpoint()
 def respond_to_chat(context: str) -> str:
     """Responds to a chat message."""
-    detected_intent = intent.local(context=context)
-
-    match detected_intent.intent:
-        case Intent.CONVERSATION:
+    detected_intent = intent.remote(context=context)
+    match detected_intent.get("intent"):
+        case Intent.CONVERSATION.value:
             # build a respond to chat function.
             return "I'm here to help. What's on your mind?"
-        case Intent.EMERGENCY:
+        case Intent.EMERGENCY.value:
             # build a call emergency function.
             return "I'm sorry. I can't do that."
-        case Intent.THERAPIST_REQUEST:
+        case Intent.THERAPIST_REQUEST.value:
             # build a therapist request function.
             return "Here's a list of therapists."
 
@@ -47,9 +50,17 @@ def respond_to_chat(context: str) -> str:
 @app.local_entrypoint()
 def main():
     # run the function locally
-    print(respond_to_chat.local("i want to kill myself"))
-    print(respond_to_chat.local("what can you do?"))
-    print(respond_to_chat.local("find me a therapist?"))
+    # print(respond_to_chat.local("i want to kill myself"))
+    # print(respond_to_chat.local("what can you do?"))
+    # print(respond_to_chat.local("find me a therapist?"))
 
     # run the function remotely on Modal
-    print(respond_to_chat.remote("whats the weather like today?"))
+    # print(respond_to_chat("whats the weather like today?"))
+
+    # Define the URL
+    url = "https://devanshusp--example-hello-world-respond-to-chat.modal.run"
+    params = {"context": "hi"}
+    response = requests.get(url, params=params, timeout=10)
+    print(response)
+    print(response.text)
+    print(response.status_code)

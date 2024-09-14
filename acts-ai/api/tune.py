@@ -1,13 +1,18 @@
 import json
+from typing import List
 
 import requests
-# from .config import config
+from config import config
+from models import ChatCompletion
 
 
-def chat_completion(system_context: str, user_question: str, stream: bool):
+def chat_completion(
+    system_context: str, user_question: str, stream: bool
+) -> List[ChatCompletion]:
     """Send a chat completion request to the TuneStudio API"""
     headers, data = _build_tune_request_data(system_context, user_question, stream)
-    return _send_receive_req(headers, data, stream)
+    res = _send_receive_req(headers, data, stream)
+    return [ChatCompletion(**r) for r in res]
 
 
 def _send_receive_req(headers: dict, data: dict, stream: bool):

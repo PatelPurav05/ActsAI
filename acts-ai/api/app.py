@@ -5,19 +5,25 @@ API routes for [functionality].
 import json
 from pathlib import Path
 
+import json
+
 import modal
+
 from modal import Mount, asgi_app#, Image
-from .tune import chat_completion
-from .llm_tune import TuneLLM
+from api.tune import chat_completion
+from api.llm_tune import TuneLLM
 TuneLLM()
-from .common import stub
+from api.common import stub
 # from .llm_zephyr import Zephyr
-from .transcriber import Whisper
-from .tts import Tortoise
+from api.transcriber import Whisper
+from api.tts import Tortoise
+from api.models import DetectedIntent, Intent
+from api.prompts import INTENT_DETECTOR
 
 static_path = Path(__file__).parent.with_name("frontend").resolve()
 
 PUNCTUATION = [".", "?", "!", ":", ";", "*"]
+
 
 def f(query, history=''):
     system_content = (
@@ -27,10 +33,39 @@ def f(query, history=''):
     query_new = f'{query} {history}'
     res = chat_completion(
         system_context=system_content, user_question=query_new, stream=stream
+
+@app.function(secrets=[modal.Secret.from_name("hackmit")])
+def intent(context: str) -> DetectedIntent:
+    """Detects which predefined intent context falls into."""
+    res = chat_completion(
+        system_context=INTENT_DETECTOR, user_question=context, stream=False
     )
-    return res
+    detected_intent = res[0].choices[0].message.content
+    formatted_detected_intent = json.loads(detected_intent)
+    typed_detected_intent = DetectedIntent(**formatted_detected_intent)
+    return typed_detected_intent
+
+
+@app.function(secrets=[modal.Secret.from_name("hackmit")])
+def respond_to_chat(context: str) -> str:
+    """Responds to a chat message."""
+    detected_intent = intent.local(context=context)
+
+    match detected_intent.intent:
+        case Intent.CONVERSATION:
+            # build a respond to chat function.
+            return "I'm here to help. What's on your mind?"
+        case Intent.EMERGENCY:
+            # build a call emergency function.
+            return "I'm sorry. I can't do that."
+        case Intent.THERAPIST_REQUEST:
+            # build a therapist request function.
+            return "Here's a list of therapists."
+
+    return "NONE"
 
 image = modal.Image.debian_slim().pip_install("requests")
+
 
 @stub.function(
     mounts=[Mount.from_local_dir(static_path, remote_path="/assets")],
@@ -143,3 +178,13 @@ def web():
 
 #     # run the function remotely on Modal
 #     print(f.remote("whats the weather like today?"))
+
+@app.local_entrypoint()
+def main():
+    # run the function locally
+    print(respond_to_chat.local("i want to kill myself"))
+    print(respond_to_chat.local("what can you do?"))
+    print(respond_to_chat.local("find me a therapist?"))
+
+    # run the function remotely on Modal
+    # print(respond_to_chat.remote("whats the weather like today?"))

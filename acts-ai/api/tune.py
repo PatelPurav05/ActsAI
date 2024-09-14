@@ -2,8 +2,8 @@ import json
 from typing import List
 
 import requests
-from config import config
-from models import ChatCompletion
+#from api.config import config
+from api.models import ChatCompletion
 
 
 def chat_completion(

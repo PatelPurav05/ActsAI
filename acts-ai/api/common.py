@@ -1,3 +1,3 @@
-from modal import Stub
+from modal import App
 
-stub = Stub("example-hello-world")
+app = App("example-hello-world")

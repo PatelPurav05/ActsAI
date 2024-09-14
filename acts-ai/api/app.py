@@ -13,7 +13,7 @@ from modal import Mount, asgi_app#, Image
 from api.tune import chat_completion
 from api.llm_tune import TuneLLM
 TuneLLM()
-from api.common import stub
+from api.common import app
 # from .llm_zephyr import Zephyr
 from api.transcriber import Whisper
 from api.tts import Tortoise
@@ -24,17 +24,7 @@ static_path = Path(__file__).parent.with_name("frontend").resolve()
 
 PUNCTUATION = [".", "?", "!", ":", ";", "*"]
 
-
-def f(query, history=''):
-    system_content = (
-        "You are a licensed therapist and are giving advice to a patient. After 10 messages recommend a therapist to the user. Provide their name and website to find them."
-    )
-    stream = False
-    query_new = f'{query} {history}'
-    res = chat_completion(
-        system_context=system_content, user_question=query_new, stream=stream
-
-@app.function(secrets=[modal.Secret.from_name("hackmit")])
+@app.function()#secrets=[modal.Secret.from_name("hackmit")])
 def intent(context: str) -> DetectedIntent:
     """Detects which predefined intent context falls into."""
     res = chat_completion(
@@ -46,28 +36,39 @@ def intent(context: str) -> DetectedIntent:
     return typed_detected_intent
 
 
-@app.function(secrets=[modal.Secret.from_name("hackmit")])
+@app.function()#secrets=[modal.Secret.from_name("hackmit")])
 def respond_to_chat(context: str) -> str:
     """Responds to a chat message."""
     detected_intent = intent.local(context=context)
 
-    match detected_intent.intent:
-        case Intent.CONVERSATION:
-            # build a respond to chat function.
-            return "I'm here to help. What's on your mind?"
-        case Intent.EMERGENCY:
-            # build a call emergency function.
-            return "I'm sorry. I can't do that."
-        case Intent.THERAPIST_REQUEST:
-            # build a therapist request function.
-            return "Here's a list of therapists."
+    # match detected_intent.intent:
+    #     case Intent.CONVERSATION:
+    #         # build a respond to chat function.
+    #         return "I'm here to help. What's on your mind?"
+    #     case Intent.EMERGENCY:
+    #         # build a call emergency function.
+    #         return "I'm sorry. I can't do that."
+    #     case Intent.THERAPIST_REQUEST:
+    #         # build a therapist request function.
+    #         return "Here's a list of therapists."
 
     return "NONE"
+
+def f(query, history=''):
+   system_content = (
+       "You are a licensed therapist and are giving advice to a patient. After 10 messages recommend a therapist to the user. Provide their name and website to find them."
+   )
+   stream = False
+   query_new = f'{query} {history}'
+   res = chat_completion(
+       system_context=system_content, user_question=query_new, stream=stream
+   )
+   return res
 
 image = modal.Image.debian_slim().pip_install("requests")
 
 
-@stub.function(
+@app.function(
     mounts=[Mount.from_local_dir(static_path, remote_path="/assets")],
     container_idle_timeout=300,
     timeout=600,
@@ -81,7 +82,6 @@ def web():
 
     web_app = FastAPI()
     transcriber = Whisper()
-    # llm = Zephyr()
     llm = TuneLLM()
     
     tts = Tortoise()
@@ -123,9 +123,8 @@ def web():
             # make request to tunehq instead of llm.generate.remote
 
             for segment in f(body["input"], body["history"]):
-                yield {"type": "text", "value": segment['choices'][0]['message']['content']}
-                print('SEGMENT', segment['choices'][0]['message']['content'])
-                sentence += segment['choices'][0]['message']['content']
+                yield {"type": "text", "value": segment.choices[0].message.content} #['choices'][0]['message']['content']
+                sentence += segment.choices[0].message.content
 
                 for p in PUNCTUATION:
                     if p in sentence:
@@ -174,17 +173,6 @@ def web():
 # @app.local_entrypoint()
 # def main():
 #     # run the function locally
-#     print(f.local("whats the weather like today?"))
-
-#     # run the function remotely on Modal
-#     print(f.remote("whats the weather like today?"))
-
-@app.local_entrypoint()
-def main():
-    # run the function locally
-    print(respond_to_chat.local("i want to kill myself"))
-    print(respond_to_chat.local("what can you do?"))
-    print(respond_to_chat.local("find me a therapist?"))
-
-    # run the function remotely on Modal
-    # print(respond_to_chat.remote("whats the weather like today?"))
+#     print(respond_to_chat.local("i want to kill myself"))
+#     print(respond_to_chat.local("what can you do?"))
+#     print(respond_to_chat.local("find me a therapist?"))

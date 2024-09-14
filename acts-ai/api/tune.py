@@ -1,7 +1,7 @@
 import json
 
 import requests
-from config import config
+# from .config import config
 
 
 def chat_completion(system_context: str, user_question: str, stream: bool):
@@ -31,7 +31,7 @@ def _send_receive_req(headers: dict, data: dict, stream: bool):
 
 def _build_tune_request_data(system_context: str, user_question: str, stream: bool):
     """Build a request's headers and data for the TuneStudio API"""
-    api_key = config.TUNE_STUDIO_API_KEY
+    api_key = 'sk-tune-LHO7UqbwZiGkfok88K3SZnK9ZrqwjnsWyIE'
 
     headers = {
         "Authorization": api_key,

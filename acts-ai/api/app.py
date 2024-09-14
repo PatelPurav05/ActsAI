@@ -2,29 +2,144 @@
 Main web application service. Serves the frontend as well as
 API routes for [functionality].
 """
+import json
+from pathlib import Path
 
 import modal
-from tune import chat_completion
+from modal import Mount, asgi_app#, Image
+from .tune import chat_completion
+from .llm_tune import TuneLLM
+TuneLLM()
+from .common import stub
+# from .llm_zephyr import Zephyr
+from .transcriber import Whisper
+from .tts import Tortoise
 
-app = modal.App("example-hello-world")
+static_path = Path(__file__).parent.with_name("frontend").resolve()
 
+PUNCTUATION = [".", "?", "!", ":", ";", "*"]
 
-@app.function()
-def f(query):
+def f(query, history=''):
     system_content = (
-        "You answer all questions with only emojis. You are a helpful assistant."
+        "You are a licensed therapist and are giving advice to a patient. After 10 messages recommend a therapist to the user. Provide their name and website to find them."
     )
     stream = False
+    query_new = f'{query} {history}'
     res = chat_completion(
-        system_context=system_content, user_question=query, stream=stream
+        system_context=system_content, user_question=query_new, stream=stream
     )
     return res
 
+image = modal.Image.debian_slim().pip_install("requests")
 
-@app.local_entrypoint()
-def main():
-    # run the function locally
-    print(f.local("whats the weather like today?"))
+@stub.function(
+    mounts=[Mount.from_local_dir(static_path, remote_path="/assets")],
+    container_idle_timeout=300,
+    timeout=600,
+    image=image,
+)
+@asgi_app()
+def web():
+    from fastapi import FastAPI, Request
+    from fastapi.responses import Response, StreamingResponse
+    from fastapi.staticfiles import StaticFiles
 
-    # run the function remotely on Modal
-    print(f.remote("whats the weather like today?"))
+    web_app = FastAPI()
+    transcriber = Whisper()
+    # llm = Zephyr()
+    llm = TuneLLM()
+    
+    tts = Tortoise()
+
+    @web_app.post("/transcribe")
+    async def transcribe(request: Request):
+        bytes = await request.body()
+        result = transcriber.transcribe_segment.remote(bytes)
+        return result["text"]
+
+    @web_app.post("/generate")
+    async def generate(request: Request):
+        body = await request.json()
+        tts_enabled = body["tts"]
+
+        if "noop" in body:
+            # Warm up 3 containers for now.
+            if tts_enabled:
+                for _ in range(3):
+                    tts.speak.spawn("")
+            return
+
+        def speak(sentence):
+            if tts_enabled:
+                fc = tts.speak.spawn(sentence)
+                return {
+                    "type": "audio",
+                    "value": fc.object_id,
+                }
+            else:
+                return {
+                    "type": "sentence",
+                    "value": sentence,
+                }
+
+        def gen():
+            sentence = ""
+
+            # make request to tunehq instead of llm.generate.remote
+
+            for segment in f(body["input"], body["history"]):
+                yield {"type": "text", "value": segment['choices'][0]['message']['content']}
+                print('SEGMENT', segment['choices'][0]['message']['content'])
+                sentence += segment['choices'][0]['message']['content']
+
+                for p in PUNCTUATION:
+                    if p in sentence:
+                        prev_sentence, new_sentence = sentence.rsplit(p, 1)
+                        yield speak(prev_sentence)
+                        sentence = new_sentence
+
+            if sentence:
+                yield speak(sentence)
+
+        def gen_serialized():
+            for i in gen():
+                yield json.dumps(i) + "\x1e"
+
+        return StreamingResponse(
+            gen_serialized(),
+            media_type="text/event-stream",
+        )
+
+    @web_app.get("/audio/{call_id}")
+    async def get_audio(call_id: str):
+        from modal.functions import FunctionCall
+
+        function_call = FunctionCall.from_id(call_id)
+        try:
+            result = function_call.get(timeout=30)
+        except TimeoutError:
+            return Response(status_code=202)
+
+        if result is None:
+            return Response(status_code=204)
+
+        return StreamingResponse(result, media_type="audio/wav")
+
+    @web_app.delete("/audio/{call_id}")
+    async def cancel_audio(call_id: str):
+        from modal.functions import FunctionCall
+
+        print("Cancelling", call_id)
+        function_call = FunctionCall.from_id(call_id)
+        function_call.cancel()
+
+    web_app.mount("/", StaticFiles(directory="/assets", html=True))
+    return web_app
+
+# @app.local_entrypoint()
+# def main():
+#     # run the function locally
+#     print(f.local("whats the weather like today?"))
+
+#     # run the function remotely on Modal
+#     print(f.remote("whats the weather like today?"))

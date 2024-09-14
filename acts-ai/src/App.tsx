@@ -1,35 +1,57 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { SignInButton } from "@clerk/clerk-react";
+import { Authenticated, Unauthenticated, useQuery } from "convex/react";
+import { api } from "../convex/_generated/api";
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="min-h-screen bg-background flex flex-col">
+      <nav className="border-b">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16 items-center">
+            <div className="flex-shrink-0">
+              <h1 className="text-2xl font-bold text-primary">Acts.ai</h1>
+            </div>
+  
+          </div>
+        </div>
+      </nav>
+
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow flex flex-col justify-center">
+        <Unauthenticated>
+          <WelcomeContent />
+        </Unauthenticated>
+        <Authenticated>
+          <Content />
+        </Authenticated>
+      </main>
+    </div>
+  );
 }
 
-export default App
+function WelcomeContent() {
+  return (
+    <div className="text-center">
+      <h2 className="text-4xl font-bold mb-6">Welcome to Acts.ai</h2>
+      <p className="text-xl mb-8">Your journey to better mental health starts here.</p>
+      <p className="mb-4">Sign in to access your personalized mental health resources.</p>
+      <SignInButton>
+        <button className="bg-primary text-primary-foreground px-6 py-2 rounded-full text-lg">
+          Sign In
+        </button>
+      </SignInButton>
+    </div>
+  );
+}
+
+function Content() {
+  const messages = useQuery(api.messages.getForCurrentUser);
+  return (
+    <div className="text-center">
+      <h2 className="text-3xl font-bold mb-4">Your Dashboard</h2>
+      <p className="text-xl mb-4">Welcome back!</p>
+      <div>Authenticated content: {messages?.length}</div>
+    </div>
+  );
+}
+
+export default App;

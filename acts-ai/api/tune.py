@@ -36,7 +36,7 @@ def _send_receive_req(headers: dict, data: dict, stream: bool):
 
 def _build_tune_request_data(system_context: str, user_question: str, stream: bool):
     """Build a request's headers and data for the TuneStudio API"""
-    api_key = 'sk-tune-LHO7UqbwZiGkfok88K3SZnK9ZrqwjnsWyIE'
+    api_key = ''
 
     headers = {
         "Authorization": api_key,

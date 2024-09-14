@@ -6,7 +6,6 @@ import "./index.css";
 import { ClerkProvider, useAuth } from "@clerk/clerk-react";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
 // deleted ConvexProvider right below
-import { ConvexReactClient } from "convex/react";
 import { ConvexProvider, ConvexReactClient } from "convex/react";
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 
@@ -23,15 +22,10 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <ClerkProvider publishableKey="pk_test_c3VtbWFyeS1nb3BoZXItMTUuY2xlcmsuYWNjb3VudHMuZGV2JA">
       <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
+        <ChakraProvider theme={theme} >
+        <App />
+        </ChakraProvider>
       </ConvexProviderWithClerk>
     </ClerkProvider>
-    <ConvexProvider client={convex}>
-      <ChakraProvider theme={theme} >
-        <App />
-      </ChakraProvider>
-    </ConvexProvider>
   </React.StrictMode>,
 );

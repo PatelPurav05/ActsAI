@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { Id } from "../convex/_generated/dataModel";
 import { api } from "../convex/_generated/api";
 import ChatRoom from "./ChatRoom";
@@ -7,15 +7,38 @@ import { Box, Button, Menu, MenuButton, MenuItem, MenuList, Flex, Text, VStack, 
 import { ChevronDownIcon } from "@chakra-ui/icons";
 
 function Chats() {
-  const rooms = useQuery(api.rooms.getRooms); // Fetch rooms
+  const rooms = useQuery(api.rooms.getRoomsForCurrUser); // Fetch rooms
   const [selectedRoom, setSelectedRoom] = useState<Id<"rooms"> | null>(null);
   const [selectedTherapist, setSelectedTherapist] = useState<string | null>(null);
+  const [selectedPatient, setSelectedPatient] = useState<string | null>(null);
 
+
+  const createRoom = useMutation(api.rooms.createRoom); // UseMutation for the createRoom mutation
+  const user = useQuery(api.users.getUser);
+  const [roomName, setRoomName] = useState("TestRoom");
+  const [patient, setPatient] = useState("Purav Patel");
+  const [therapist, setTherapist] = useState("Therapist 1");
+
+  // Handler for creating a room
+  const handleCreateRoom = async () => {
+    if (roomName && patient && therapist) {
+      try {
+        // Call mutation and pass the required arguments
+        await createRoom({ roomName, patient, therapist, notes: []});
+        alert("Room created successfully");
+      } catch (error) {
+        console.error("Error creating room:", error);
+      }
+    } else {
+      alert("Please fill in all fields");
+    }
+  };
   // Set the first room as the default selected room
   useEffect(() => {
     if (rooms && rooms.length > 0 && !selectedRoom) {
       setSelectedRoom(rooms[0]._id);
       setSelectedTherapist(rooms[0].therapist)
+      setSelectedPatient(rooms[0].patient)
     }
   }, [rooms, selectedRoom]);
 
@@ -36,7 +59,7 @@ function Chats() {
         </Text>
         <Menu>
           <MenuButton as={Button} rightIcon={<ChevronDownIcon />} colorScheme="blue" w="full">
-            {selectedTherapist ? `${selectedTherapist}` : "Select a Therapist"}
+            {(user?.userType === "patient" ? (selectedTherapist ? `${selectedTherapist}` : "Select a Therapist") : (selectedPatient ? `${selectedPatient}`: "Select a Patient"))}
           </MenuButton>
           <MenuList bg="gray.800">
             {rooms?.map((room) => (
@@ -46,11 +69,14 @@ function Chats() {
                 bg="gray.700"
                 _hover={{ bg: "blue.500", color: "white" }}
               >
-                {room.name}
+                {user?.userType === "patient"? room.therapist: room.patient}
               </MenuItem>
             ))}
           </MenuList>
         </Menu>
+        <Button onClick={handleCreateRoom}>
+            Create Chat
+          </Button>
       </VStack>
 
       {/* Right Side: Chat Room */}

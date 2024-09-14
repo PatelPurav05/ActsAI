@@ -5,6 +5,7 @@ import { Id } from "../convex/_generated/dataModel";
 import { Box, Input, Button, VStack, Text, HStack, Flex } from "@chakra-ui/react";
 import { FiSend } from "react-icons/fi";
 import { motion } from "framer-motion";
+import { useUser } from "@clerk/clerk-react"; // Import Clerk's useUser hook
 
 interface ChatRoomProps {
   roomId: Id<"rooms">;
@@ -13,17 +14,22 @@ interface ChatRoomProps {
 const ChatRoom: React.FC<ChatRoomProps> = ({ roomId }) => {
   const messages = useQuery(api.messages.getMessagesForRoom, { roomId });
   const sendMessage = useMutation(api.messages.sendMessage);
+  const { user } = useUser(); // Fetch the current user's information using Clerk
   const [newMessage, setNewMessage] = useState<string>("");
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   const handleSendMessage = async () => {
     if (newMessage.trim()) {
-      await sendMessage({ roomId, body: newMessage, author: "User1" });
+      await sendMessage({
+        roomId,
+        body: newMessage,
+        author: user?.fullName ?? "Anonymous", // Ensure author is always a string
+    });
       setNewMessage("");
     }
   };
 
-  // Auto-scroll to bottom when messages change
+  // Auto-scroll to the bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -43,11 +49,11 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ roomId }) => {
           <Box
             key={message._id}
             as={motion.div}
-            bg={message.author === "User1" ? "blue.500" : "gray.700"}
+            bg={message.author === (user?.fullName) ? "blue.500" : "gray.700"}
             color="white"
             p={3}
             rounded="lg"
-            alignSelf={message.author === "User1" ? "flex-end" : "flex-start"}
+            alignSelf={message.author === (user?.fullName) ? "flex-end" : "flex-start"}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
           >

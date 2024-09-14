@@ -1,30 +1,50 @@
-import { SignInButton } from "@clerk/clerk-react";
-import { Authenticated, Unauthenticated, useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { SignInButton, UserButton } from "@clerk/clerk-react";
+import { Authenticated, Unauthenticated, useQuery } from "convex/react"; // Optional if using both
+import Chats from "./Chats";
+import { useStoreUserEffect } from "./useStoreUserEffect"; // Your custom hook for Clerk state
+import { Vortex } from "./vortex";
 
 function App() {
-  return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <nav className="border-b">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16 items-center">
-            <div className="flex-shrink-0">
-              <h1 className="text-2xl font-bold text-primary">Acts.ai</h1>
-            </div>
-  
-          </div>
-        </div>
-      </nav>
+  const { isLoading, isAuthenticated } = useStoreUserEffect();
 
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow flex flex-col justify-center">
-        <Unauthenticated>
-          <WelcomeContent />
-        </Unauthenticated>
-        <Authenticated>
-          <Content />
-        </Authenticated>
-      </main>
-    </div>
+  if (isLoading) {
+    return <div className="w-screen h-screen"><Vortex/></div>; // Optionally add a spinner or loading animation here
+  }
+
+  return (
+    <Router>
+      <Routes>
+        {/* Main Route - Based on Authentication */}
+        <Route
+          path="/"
+          element={
+            isAuthenticated ? (
+              <Navigate to="/chats" />
+            ) : (
+              <main className="container mx-auto flex-grow flex flex-col justify-center">
+                <WelcomeContent />
+              </main>
+            )
+          }
+        />
+
+        {/* Authenticated Route for Chat */}
+        <Route
+          path="/chats"
+          element={
+            isAuthenticated ? (
+              <Authenticated>
+                <Chats />
+              </Authenticated>
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+      </Routes>
+    </Router>
   );
 }
 

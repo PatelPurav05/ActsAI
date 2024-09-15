@@ -3,6 +3,8 @@ import { motion } from "framer-motion";
 import { ChevronDown, Brain, Heart, Phone } from "lucide-react";
 import actsLogo from "./acts.png";
 import "./newindex.css";
+import { SignInButton, SignOutButton } from "@clerk/clerk-react";
+import { Authenticated, Unauthenticated } from "convex/react";
 
 export default function Component() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -15,7 +17,18 @@ export default function Component() {
             <img src={actsLogo} alt="Logo" className="h-10 w-10" />
             <span className="text-2xl font-bold text-green-700">Acts.ai</span>
           </div>
-          <nav className="hidden md:flex space-x-8">
+          <nav className="hidden md:flex items-center space-x-6">
+            <Unauthenticated>
+              <SignInButton mode="modal">
+                <button className="bg-primary text-black px-2 py-2 rounded-md text-base font-medium hover:bg-primary-dark transition">
+                  Sign In
+                </button>
+              </SignInButton>
+            </Unauthenticated>
+            <Authenticated>
+              <SignOutButton redirectUrl="https://mhanational.org/" />
+            </Authenticated>
+
             <a
               href="/"
               className="text-gray-600 hover:text-green-700 transition-colors"

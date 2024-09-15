@@ -40,7 +40,7 @@ def respond_to_chat(context: str) -> str:
             return "I'm here to help. What's on your mind?"
         case Intent.EMERGENCY.value:
             send_emergency_email()
-            return "You may be exerpeicning a mental health emergency. Please call 988."
+            return "You may be experiencing a mental health emergency. Please call 988."
         case Intent.THERAPIST_REQUEST.value:
             # build a therapist request function.
             return "Here's a list of therapists."

@@ -5,6 +5,7 @@ import WellnessPage from "./wellness";
 import EmergencyContact from "./contact";
 import { useState } from "react";
 import "./newindex.css";
+import Chats from "./Chats";
 
 export default function Component() {
   const [currentPage, setCurrentPage] = useState("home");
@@ -66,7 +67,7 @@ export default function Component() {
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-primary">
+                  <a href="#" onClick={() => setCurrentPage("AI Therapist")} className="hover:text-primary">
                     AI Therapist
                   </a>
                 </li>

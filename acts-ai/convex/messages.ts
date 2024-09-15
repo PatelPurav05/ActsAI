@@ -16,6 +16,17 @@ export const getForCurrentUser = query({
   },
 });
 
+export const sendMessage = mutation({
+  args: {
+    author: v.string(),
+    body: v.string(),
+    roomId: v.id("rooms"),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.insert("messages", args);
+  },
+});
+
 // Fetch messages for a specific room, sorted by _creationTime
 export const list = query(async ({ db }, { roomId }: { roomId: string }) => {
     return await db.query("messages")

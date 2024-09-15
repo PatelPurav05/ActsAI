@@ -19,7 +19,6 @@
     "@huggingface/inference": "^2.8.0",
     "@react-three/drei": "^9.112.0",
     "@react-three/fiber": "^8.17.7",
-    "@rollup/rollup-darwin-arm64": "^4.21.3",
     "aceternity-ui": "^0.2.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",

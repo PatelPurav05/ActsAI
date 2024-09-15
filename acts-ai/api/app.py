@@ -11,6 +11,7 @@ from models import Intent
 from prompts import INTENT_DETECTOR
 from tune import chat_completion
 from api.emergency_email import send_emergency_email
+from api.therapists_list.therapists_db import get_therapists
 
 image = modal.Image.debian_slim().pip_install(["requests", "python-dotenv"])
 app = modal.App(
@@ -42,8 +43,11 @@ def respond_to_chat(context: str) -> str:
             send_emergency_email()
             return "You may be experiencing a mental health emergency. Please call 988."
         case Intent.THERAPIST_REQUEST.value:
-            # build a therapist request function.
-            return "Here's a list of therapists."
+            filler_query = "['Depression', 'Anxiety']" # UPDATE LATER WITH USER DATA
+            therapists = get_therapists(filler_query)
+            therapist_one = therapists['metadatas'][0]
+            therapist_two = therapists['metadatas'][1]
+            return f"The therapists near you are {therapist_one['names']} and {therapist_two['names']}. {therapist_one['names']} can be contacted at {therapist_one['phone']} and to find out more you can visit their website at {therapist_one['website']}. They are located at {therapist_one['location']}. {therapist_two['names']} can be contacted at {therapist_two['phone']} and to find out more you can visit their website at {therapist_two['website']}. They are located at {therapist_two['location']}."
 
     return "NONE"
 

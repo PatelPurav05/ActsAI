@@ -8,9 +8,9 @@ load_dotenv()
 
 def send_an_sms():
     sinch_client = SinchClient(
-        key_id=os.environ.get("SINCH_KEY_ID"), #"30ad667f-217f-4e18-a4b5-c1f34a705899",
-        key_secret=os.environ.get("SINCH_KEY_SECRET"), #"N6SWK2w4Fs7SLVi~-IYZD5U5IU",
-        project_id=os.environ.get("SINCH_PROJ_ID")#"7b70ada2-c15c-4a06-9472-c209c37f205d"
+        key_id=os.environ.get("SINCH_KEY_ID"), 
+        key_secret=os.environ.get("SINCH_KEY_SECRET"),
+        project_id=os.environ.get("SINCH_PROJ_ID")
     )
 
     mental_health_reminders = ["Take a Break: It's okay to pause. Your mental health is just as important as your productivity", 

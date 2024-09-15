@@ -15,3 +15,14 @@ export const getForCurrentUser = query({
       .collect();
   },
 });
+
+export const sendMessage = mutation({
+  args: {
+    author: v.string(),
+    body: v.string(),
+    roomId: v.id("rooms"),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.insert("messages", args);
+  },
+});

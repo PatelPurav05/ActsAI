@@ -2,8 +2,21 @@ import { SignInButton, UserButton } from "@clerk/clerk-react";
 import { Authenticated, Unauthenticated, useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
 import { Link } from 'react-router-dom';
+import { api } from "../convex/_generated/api";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { SignInButton, UserButton } from "@clerk/clerk-react";
+import { Authenticated, Unauthenticated, useQuery } from "convex/react"; // Optional if using both
+import Chats from "./Chats";
+import { useStoreUserEffect } from "./useStoreUserEffect"; // Your custom hook for Clerk state
+import { Vortex } from "./vortex";
 
 function App() {
+  const { isLoading, isAuthenticated } = useStoreUserEffect();
+
+  if (isLoading) {
+    return <div className="w-screen h-screen"><Vortex/></div>; // Optionally add a spinner or loading animation here
+  }
+
   return (
     <div className="min-h-screen bg-background flex flex-col items-center">
       <nav className="bg-white border-b shadow-md w-full">
@@ -47,6 +60,37 @@ function App() {
         </Authenticated>
       </main>
     </div>
+    <Router>
+      <Routes>
+        {/* Main Route - Based on Authentication */}
+        <Route
+          path="/"
+          element={
+            isAuthenticated ? (
+              <Navigate to="/chats" />
+            ) : (
+              <main className="container mx-auto flex-grow flex flex-col justify-center">
+                <WelcomeContent />
+              </main>
+            )
+          }
+        />
+
+        {/* Authenticated Route for Chat */}
+        <Route
+          path="/chats"
+          element={
+            isAuthenticated ? (
+              <Authenticated>
+                <Chats />
+              </Authenticated>
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+      </Routes>
+    </Router>
   );
 }
 

@@ -36,7 +36,7 @@ export default function Component() {
               Home
             </a>
             <a
-              href="/"
+              href="/Chats"
               className="text-gray-600 hover:text-green-700 transition-colors"
             >
               AI Therapist
@@ -46,6 +46,12 @@ export default function Component() {
               className="text-gray-600 hover:text-green-700 transition-colors"
             >
               Wellness
+            </a>
+            <a
+              href="/form"
+              className="text-gray-600 hover:text-green-700 transition-colors"
+            >
+              Mental Health Form
             </a>
             <a
               href="/contact"
@@ -78,7 +84,7 @@ export default function Component() {
                 Home
               </a>
               <a
-                href="/"
+                href="/Chats"
                 className="text-gray-600 hover:text-green-700 transition-colors"
               >
                 AI Therapist
@@ -88,6 +94,12 @@ export default function Component() {
                 className="text-gray-600 hover:text-green-700 transition-colors"
               >
                 Wellness
+              </a>
+              <a
+                href="/form"
+                className="text-gray-600 hover:text-green-700 transition-colors"
+              >
+                Mental Health Form
               </a>
               <a
                 href="/contact"

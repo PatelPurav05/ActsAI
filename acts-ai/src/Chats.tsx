@@ -6,6 +6,7 @@ import ChatRoom from "./ChatRoom";
 import { Box, Button, Menu, MenuButton, MenuItem, MenuList, Flex, Text, VStack, HStack } from "@chakra-ui/react";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import { useStoreUserEffect } from "./useStoreUserEffect";
+import Navbar from "./Navbar";
 
 function Chats() {
   
@@ -46,7 +47,9 @@ function Chats() {
   const { isLoading, isAuthenticated } = useStoreUserEffect();
 
   return (
-    <div className=" w-100">
+    <div><Navbar />
+    <div className=" w-100 mx-10">
+    
     {isAuthenticated ?
     <Flex height="100vh" bg="white">
       {/* Left Side: Room Selection */}
@@ -98,6 +101,7 @@ function Chats() {
       </Flex>
     </Flex>
  : <></>}
+    </div>
     </div>
   );
 }

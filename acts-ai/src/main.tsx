@@ -8,7 +8,7 @@ import "./newindex.css";
 import { ClerkProvider, useAuth } from "@clerk/clerk-react";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
 // deleted ConvexProvider right below
-import { ConvexReactClient } from "convex/react";
+import { Authenticated, ConvexReactClient } from "convex/react";
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import WellnessPage from "./wellness";
 import ContactPage from "./contact";
@@ -34,7 +34,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               <Route path="/" element={<App />} />
               <Route path="/wellness" element={<WellnessPage />} />
               <Route path="/contact" element={<ContactPage />} />
-              <Route path="/chats" element={<Chats />} />
+              <Route path="/chats" element={<Authenticated><Chats /></Authenticated>} />
             </Routes>
           </BrowserRouter>
         </ChakraProvider>

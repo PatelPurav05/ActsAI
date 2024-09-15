@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { ChevronDown, Phone, Mail, Heart } from "lucide-react";
 import actsLogo from "./acts.png";
 import "./newindex.css";
+import { Authenticated } from "convex/react";
 
 export default function EmergencyContact() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -22,12 +23,14 @@ export default function EmergencyContact() {
             >
               Home
             </a>
-            <a
-              href="/"
-              className="text-gray-600 hover:text-green-700 transition-colors"
-            >
-              AI Therapist
-            </a>
+            <Authenticated>
+              <a
+                href="/chats"
+                className="text-gray-600 hover:text-green-700 transition-colors"
+              >
+                AI Therapist
+              </a>
+            </Authenticated>
             <a
               href="/wellness"
               className="text-gray-600 hover:text-green-700 transition-colors"
@@ -64,12 +67,14 @@ export default function EmergencyContact() {
               >
                 Home
               </a>
+              <Authenticated>
               <a
-                href="/"
+                href="/chats"
                 className="text-gray-600 hover:text-green-700 transition-colors"
               >
                 AI Therapist
               </a>
+              </Authenticated>
               <a
                 href="/wellness"
                 className="text-gray-600 hover:text-green-700 transition-colors"

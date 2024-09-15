@@ -5,7 +5,7 @@ import pandas as pd
 
 def get_therapists(query: list[str]):
     df = pd.read_csv('api/therapists_list/cambridge_therapists.csv')
-    print(df)
+    # print(df)
     
     model = SentenceTransformer('all-MiniLM-L6-v2')
     names = df['Name']
@@ -26,7 +26,7 @@ def get_therapists(query: list[str]):
 
     try:
         client.delete_collection(name=collection_name)
-        print(f"COLLECTION {collection_name} DELETED")
+        # print(f"COLLECTION {collection_name} DELETED")
     except:
         print(f"COLLECTION {collection_name} DIDNT EXIST YET")
 
@@ -37,7 +37,7 @@ def get_therapists(query: list[str]):
 
     # fill vector database
     for i in range(len(names)):
-        print(f"Add stuff for topic {names[i]}")
+        # print(f"Add stuff for topic {names[i]}")
         collection.add(
             embeddings=[keyword_embeddings[names[i]]], 
             documents=[names[i]],  

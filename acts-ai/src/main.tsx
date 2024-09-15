@@ -13,6 +13,8 @@ import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import WellnessPage from "./wellness";
 import ContactPage from "./contact";
 
+import Chats from "./Chats";
+
 const theme = extendTheme({
   config: {
     initialColorMode: "dark",

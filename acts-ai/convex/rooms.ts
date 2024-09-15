@@ -21,15 +21,28 @@ export const getRoomsForCurrUser = query({
   });
 
 // Create a new room
-export const createRoom = mutation(async ({ db }, { roomName, patient, therapist, notes }: { roomName: string, patient: string, therapist: string, notes: []}) => {
-  const room = {
-    name: roomName,
-    patient: patient,
-    therapist: therapist,
-    notes: notes
-  };
-  await db.insert("rooms", room);
-});
+export const createRoom = mutation(async ({ db }, { roomName, patient, therapist, notes }: { roomName: string, patient: string, therapist: string, notes: [] }) => {
+    // Check if a room with the same patient and therapist already exists
+    const existingRoom = await db.query("rooms")
+      .filter(q => q.eq(q.field("patient"), patient))
+      .filter(q => q.eq(q.field("therapist"), therapist))
+      .first();
+  
+    if (existingRoom) {
+      throw new Error("Room with the same patient and therapist already exists.");
+    }
+  
+    // If no existing room is found, create a new one
+    const room = {
+      name: roomName,
+      patient: patient,
+      therapist: therapist,
+      notes: notes
+    };
+  
+    await db.insert("rooms", room);
+  });
+  
 
 export const getRoomById = query({
     args: { roomId: v.id("rooms") },

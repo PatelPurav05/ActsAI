@@ -22,15 +22,41 @@ export const chat = action({
     console.log(res)
 
     // Parse the response (assuming text format, but change as needed)
-    const messageContent = (await res.text()) || "Sorry, I don't have an answer for that.";
+    const messageContent = (await res.json()) || "Sorry, I don't have an answer for that.";
     console.log(messageContent);
 
-    // Send AI's response as a new message
-    await ctx.runMutation(api.messages.sendMessage, {
-      author: "AI Agent",
-      body: messageContent,
-      roomId: args.roomID,
-    });
+    if (messageContent["EMERGENCY"]){
+        await ctx.runMutation(api.messages.sendMessage, {
+        author: "AI Agent",
+        body: messageContent["EMERGENCY"] + "\n In case of any emergency, please call (111) 111-1111.",
+        roomId: args.roomID,
+        });
+        return {msg: "EMERGENCY", content: messageContent["EMERGENCY"]}
+    }
+    else if (messageContent["CONVERSATION"]){
+        await ctx.runMutation(api.messages.sendMessage, {
+            author: "AI Agent",
+            body: messageContent["CONVERSATION"],
+            roomId: args.roomID,
+            });
+        return {msg: "OKAY", content: messageContent["CONVERSATION"]}
+    }
+    else if (messageContent["THERAPIST_REQUEST"]){
+        await ctx.runMutation(api.messages.sendMessage, {
+            author: "AI Agent",
+            body: messageContent["THERAPIST_REQUEST"],
+            roomId: args.roomID,
+            });
+        return {msg: "THERAPIST_REQUEST", content: messageContent["THERAPISTS"]}
+    }
+    else{
+        await ctx.runMutation(api.messages.sendMessage, {
+            author: "AI Agent",
+            body: "Sorry, there were some technical difficulties.",
+            roomId: args.roomID,
+            });
+        return {msg: "DIFFICULTIES", content: "technical difficulties"}
+    }
   },
 });
 

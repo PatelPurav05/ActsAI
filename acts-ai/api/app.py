@@ -35,6 +35,17 @@ def intent(context: str) -> dict:
 def respond_to_chat(context: str) -> str:
     """Responds to a chat message."""
     detected_intent = intent.remote(context=context)
+    user_keywords = []
+    if 'sad' in context:
+        user_keywords.append('Depression')
+    if 'stress' in context or 'worried' in context or 'anxious' in context:
+        user_keywords.append('Anxiety')
+    if 'anger' in context:
+        user_keywords.append('Anger')
+    if 'relationship' in context:
+        user_keywords.append('Relationships')
+    if 'school' in context or 'class' in context or 'grade' in context or 'job' in context or 'career' in context:
+        user_keywords.append('Career Counseling')
     match detected_intent.get("intent"):
         case Intent.CONVERSATION.value:
             # build a respond to chat function.
@@ -43,7 +54,7 @@ def respond_to_chat(context: str) -> str:
             send_emergency_email()
             return "You may be experiencing a mental health emergency. Please call 988."
         case Intent.THERAPIST_REQUEST.value:
-            filler_query = "['Depression', 'Anxiety']" # UPDATE LATER WITH USER DATA
+            filler_query = user_keywords
             therapists = get_therapists(filler_query)
             therapist_one = therapists['metadatas'][0]
             therapist_two = therapists['metadatas'][1]

@@ -19,18 +19,5 @@ export default defineSchema({
     profile: v.record(v.string(), v.string()),
     userType: v.string(),
     tokenIdentifier: v.string(),
-  }).index("by_token", ["tokenIdentifier"]),
-  
-  therapists: defineTable({
-    name: v.string(),
-    phone: v.string(),
-    location: v.string(),
-    website: v.string(),
-    keywords: v.string(),
-    embedding: v.array(v.float64()),
-  }).vectorIndex("by_embedding", {
-    vectorField: "embedding",
-    dimensions: 768,
-    filterFields: ["name"],
-  })  
+  }).index("by_token", ["tokenIdentifier"])
 });

@@ -34,6 +34,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               <Route path="/" element={<App />} />
               <Route path="/wellness" element={<WellnessPage />} />
               <Route path="/contact" element={<ContactPage />} />
+              <Route path="/chats" element={<Chats />} />
             </Routes>
           </BrowserRouter>
         </ChakraProvider>

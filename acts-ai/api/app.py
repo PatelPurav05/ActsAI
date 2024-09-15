@@ -10,6 +10,7 @@ import requests
 from models import Intent
 from prompts import INTENT_DETECTOR
 from tune import chat_completion
+from api.emergency_email import send_emergency_email
 
 image = modal.Image.debian_slim().pip_install(["requests", "python-dotenv"])
 app = modal.App(
@@ -38,8 +39,8 @@ def respond_to_chat(context: str) -> str:
             # build a respond to chat function.
             return "I'm here to help. What's on your mind?"
         case Intent.EMERGENCY.value:
-            # build a call emergency function.
-            return "I'm sorry. I can't do that."
+            send_emergency_email()
+            return "You may be exerpeicning a mental health emergency. Please call 988."
         case Intent.THERAPIST_REQUEST.value:
             # build a therapist request function.
             return "Here's a list of therapists."

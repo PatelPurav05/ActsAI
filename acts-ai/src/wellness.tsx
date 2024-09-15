@@ -4,6 +4,8 @@ import "./newindex.css";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { ChevronDown, Heart, Leaf, Sun } from "lucide-react";
+import { SignInButton, SignOutButton } from "@clerk/clerk-react";
+import { Authenticated, Unauthenticated } from "convex/react";
 import { Authenticated } from "convex/react";
 
 export default function WellnessPage() {
@@ -18,6 +20,16 @@ export default function WellnessPage() {
             <span className="text-2xl font-bold text-green-700">Acts.ai</span>
           </div>
           <nav className="hidden md:flex space-x-8">
+            <Unauthenticated>
+              <SignInButton mode="modal">
+                <button className="bg-primary text-black px-2 py-2 rounded-md text-base font-medium hover:bg-primary-dark transition">
+                  Sign In
+                </button>
+              </SignInButton>
+            </Unauthenticated>
+            <Authenticated>
+              <SignOutButton redirectUrl="https://mhanational.org/" />
+            </Authenticated>
             <a
               href="/"
               className="text-gray-600 hover:text-green-700 transition-colors"

@@ -2,7 +2,6 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import App from "./NewApp";
-import Profile from "./profile"; // Import the Profile component
 // import "./index.css";
 import "./newindex.css";
 import { ClerkProvider, useAuth } from "@clerk/clerk-react";
@@ -12,8 +11,11 @@ import { Authenticated, ConvexReactClient } from "convex/react";
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import WellnessPage from "./wellness";
 import ContactPage from "./contact";
+import Submit from "./submit";
 
 import Chats from "./Chats";
+import MentalHealthForm from "./form";
+import RecommendedTherapists from "./rec";
 
 const theme = extendTheme({
   config: {
@@ -34,6 +36,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               <Route path="/" element={<App />} />
               <Route path="/wellness" element={<WellnessPage />} />
               <Route path="/contact" element={<ContactPage />} />
+              <Route path="/form" element={<MentalHealthForm />} />
+              <Route path="/rec" element={<RecommendedTherapists />} />
+              <Route path="/submit" element={<Submit />} />
               <Route path="/chats" element={<Authenticated><Chats /></Authenticated>} />
             </Routes>
           </BrowserRouter>

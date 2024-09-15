@@ -1,45 +1,79 @@
-import { useUser } from "@clerk/clerk-react";
 import { useConvexAuth, useQuery } from "convex/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useMutation } from "convex/react";
 import { api } from "../convex/_generated/api";
 import { Id } from "../convex/_generated/dataModel";
 
 export function useStoreUserEffect() {
-  const { isLoading, isAuthenticated } = useConvexAuth();
-  const { user } = useUser();
-  // When this state is set we know the server
-  // has stored the user.
+  const { isLoading: convexLoading, isAuthenticated } = useConvexAuth();
   const [userId, setUserId] = useState<Id<"users"> | null>(null);
+  const [isStoring, setIsStoring] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   const storeUser = useMutation(api.users.store);
-  const createRoom = useMutation(api.rooms.createRoom)  
+  const createRoom = useMutation(api.rooms.createRoom);
   const currUser = useQuery(api.users.getUser);
 
-  // Call the `storeUser` mutation function to store
-  // the current user in the `users` table and return the `Id` value.
-  useEffect(() => {
-    // If the user is not logged in don't do anything
-    if (!isAuthenticated) {
-      return;
-    }
-    // Store the user in the database.
-    // Recall that `storeUser` gets the user information via the `auth`
-    // object on the server. You don't need to pass anything manually here.
-    async function createUser() {
+  const createUserAndRoom = useCallback(async () => {
+    if (isStoring) return;
+    setIsStoring(true);
+    setError(null);
+
+    try {
+      console.log("Storing user...");
       const id = await storeUser();
+      console.log("User stored with ID:", id);
       setUserId(id);
-      let name = currUser?.name ?? ""
-      createRoom({roomName: "AI Therapist", patient: name, therapist: "AI Therapist", notes: []})
+
+      const name = currUser?.name ?? "";
+      console.log("Creating room for user:", name);
+      await createRoom({
+        roomName: "AI Therapist",
+        patient: name,
+        therapist: "AI Therapist",
+        notes: [],
+      });
+      console.log("Room created successfully");
+    } catch (err) {
+      console.error("Error in createUserAndRoom:", err);
+      setError((err as Error).message || "An error occurred");
+    } finally {
+      setIsStoring(false);
     }
-    createUser();
-    
-    return () => setUserId(null);
-    // Make sure the effect reruns if the user logs in with
-    // a different identity
-  }, [isAuthenticated, storeUser, user?.id]);
-  // Combine the local state with the state from context
+  }, [storeUser, createRoom, currUser]);
+
+  useEffect(() => {
+    console.log(
+      "useEffect running. isAuthenticated:",
+      isAuthenticated,
+      "userId:",
+      userId
+    );
+    if (isAuthenticated && !userId && !isStoring) {
+      createUserAndRoom();
+    }
+  }, [isAuthenticated, userId, createUserAndRoom, isStoring]);
+
+  useEffect(() => {
+    return () => {
+      console.log("Cleanup: setting userId to null");
+      setUserId(null);
+    };
+  }, []);
+
+  const isLoading =
+    convexLoading || (isAuthenticated && userId === null) || isStoring;
+
+  console.log("useStoreUserEffect state:", {
+    isLoading,
+    isAuthenticated,
+    userId,
+    error,
+  });
+
   return {
-    isLoading: isLoading || (isAuthenticated && userId === null),
+    isLoading,
     isAuthenticated: isAuthenticated && userId !== null,
+    error,
   };
 }

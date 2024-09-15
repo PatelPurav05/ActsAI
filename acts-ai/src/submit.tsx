@@ -1,16 +1,16 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { ChevronDown, Brain, Heart, Phone } from "lucide-react";
-import actsLogo from "./acts.png";
+import { Link } from "react-router-dom";
 import "./newindex.css";
+import { motion } from "framer-motion";
+import { ChevronDown, Brain } from "lucide-react";
+import actsLogo from "./acts.png";
 import { SignInButton, SignOutButton } from "@clerk/clerk-react";
 import { Authenticated, Unauthenticated } from "convex/react";
+import { useState } from "react";
 
-export default function Component() {
+export default function Submit() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
   return (
-    <div className="min-h-screen bg-green-100 text-black">
+    <div className="min-h-screen bg-green-100 text-black flex flex-col">
       <header className="bg-white shadow-md">
         <div className="container mx-auto px-4 py-6 flex justify-between items-center">
           <div className="flex items-center space-x-2">
@@ -35,14 +35,12 @@ export default function Component() {
             >
               Home
             </a>
-            <Authenticated>
-              <a
-                href="/chats"
-                className="text-gray-600 hover:text-green-700 transition-colors"
-              >
-                AI Therapist
-              </a>
-            </Authenticated>
+            <a
+              href="/Chats"
+              className="text-gray-600 hover:text-green-700 transition-colors"
+            >
+              AI Therapist
+            </a>
             <a
               href="/wellness"
               className="text-gray-600 hover:text-green-700 transition-colors"
@@ -85,14 +83,12 @@ export default function Component() {
               >
                 Home
               </a>
-              <Authenticated>
-                <a
-                  href="/chats"
-                  className="text-gray-600 hover:text-green-700 transition-colors"
-                >
-                  AI Therapist
-                </a>
-              </Authenticated>
+              <a
+                href="/Chats"
+                className="text-gray-600 hover:text-green-700 transition-colors"
+              >
+                AI Therapist
+              </a>
               <a
                 href="/wellness"
                 className="text-gray-600 hover:text-green-700 transition-colors"
@@ -115,62 +111,28 @@ export default function Component() {
           </motion.nav>
         )}
       </header>
-      <main className="container mx-auto px-4 py-16">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="text-center"
-        >
-          <h1 className="text-5xl font-bold text-green-700 mb-6">
-            Welcome to Acts.ai
-          </h1>
-          <p className="text-xl text-gray-700 mb-12 max-w-2xl mx-auto">
-            Your journey to better mental health starts here. We provide
-            support, resources, and tools to help you improve your well-being
-            and lead a happier life.
-          </p>
-        </motion.div>
-        <div className="grid md:grid-cols-3 gap-8 mt-16">
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            className="bg-white rounded-lg shadow-lg p-6 text-center"
-          >
-            <Brain className="h-12 w-12 text-green-600 mx-auto mb-4" />
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-              AI Therapist
-            </h2>
-            <p className="text-gray-600">
-              Get personalized support from our advanced AI therapist, available
-              24/7.
-            </p>
-          </motion.div>
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            className="bg-white rounded-lg shadow-lg p-6 text-center"
-          >
-            <Heart className="h-12 w-12 text-green-600 mx-auto mb-4" />
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-              Wellness Resources
-            </h2>
-            <p className="text-gray-600">
-              Access a wealth of resources to support your mental health
-              journey.
-            </p>
-          </motion.div>
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            className="bg-white rounded-lg shadow-lg p-6 text-center"
-          >
-            <Phone className="h-12 w-12 text-green-600 mx-auto mb-4" />
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-              24/7 Support
-            </h2>
-            <p className="text-gray-600">
-              Get help anytime with our round-the-clock emergency support line.
-            </p>
-          </motion.div>
+      <header className="bg-white shadow-md">
+        <div className="container mx-auto px-4 py-6 flex items-center">
+          <div className="flex items-center space-x-2">
+            <Brain className="h-8 w-8 text-green-600" />
+            <span className="text-2xl font-bold text-green-700">Acts.ai</span>
+          </div>
         </div>
+      </header>
+
+      <main className="flex-grow container mx-auto px-4 py-16 flex flex-col items-center justify-center">
+        <h1 className="text-4xl font-bold text-green-700 mb-6">
+          Congratulations on submitting the form!
+        </h1>
+        <p className="text-xl text-gray-700 mb-8">
+          Thank you for your submission.
+        </p>
+        <Link
+          to="/"
+          className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded transition-colors"
+        >
+          Return to Home
+        </Link>
       </main>
     </div>
   );

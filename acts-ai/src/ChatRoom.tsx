@@ -2,6 +2,17 @@ import React, { useState, useRef, useEffect } from "react";
 import { useQuery, useMutation, useAction } from "convex/react";
 import { api } from "../convex/_generated/api";
 import { Id } from "../convex/_generated/dataModel";
+import {
+  Box,
+  Input,
+  Button,
+  VStack,
+  Text,
+  HStack,
+  Flex,
+  IconButton,
+} from "@chakra-ui/react";
+import { FiSend, FiVolume2 } from "react-icons/fi";
 import { Box, Input, Button, VStack, Text, HStack, Flex } from "@chakra-ui/react";
 import { FiSend } from "react-icons/fi";
 import { motion } from "framer-motion";
@@ -17,6 +28,9 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ roomId }) => {
   const sendMessage = useMutation(api.messages.sendMessage);
   const sendAIMessage = useAction(api.ai.chat)
   const { user } = useUser(); // Fetch the current user's information using Clerk
+  const getAllMessages = useQuery(api.ai.getMessagesForPatient, {
+    userID: user?.fullName ?? "",
+  });
   const currUser = useQuery(api.users.getUser);
   const getAllMessages = useQuery(api.ai.getMessagesForPatient, {userID: user?.fullName ?? ""})
   const [newMessage, setNewMessage] = useState<string>("");
@@ -26,11 +40,34 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ roomId }) => {
   
   const therapistName = roomData?.therapist; // Extract therapist's name or ID
 
-  const handleSendMessage = async (userName: string) => {
+  const handleSendMessage = async () => {
     if (newMessage.trim()) {
       await sendMessage({
         roomId,
         body: newMessage,
+        author: user?.fullName ?? "Anonymous",
+      });
+
+      if (roomData?.therapist === "AI Therapist") {
+        const messages = await getAllMessages;
+        if (messages) {
+          const simplifiedMessages = messages.map((msg) => ({
+            author: msg.author,
+            body: msg.body,
+          }));
+
+          const stringifiedMessages = JSON.stringify(simplifiedMessages);
+          const response = await sendAIMessage({
+            roomID: roomId,
+            messages: stringifiedMessages,
+            lastMessage: newMessage,
+            email: user?.primaryEmailAddress?.emailAddress ?? "",
+          });
+          if (response.msg === "THERAPIST_REQUEST")
+            console.log(response.content);
+        }
+      }
+      setNewMessage("");
         author: user?.fullName ?? "Anonymous", // Ensure author is always a string
     });
     if (userName === "AI Therapist"){
@@ -74,8 +111,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ roomId }) => {
         p={4}
         rounded="lg"
       >
-        
-        {messages?.map((message) => (
+      {messages?.map((message) => (
           <Box
             key={message._id}
             as={motion.div}
@@ -83,6 +119,45 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ roomId }) => {
             color="white"
             p={3}
             rounded="lg"
+            alignSelf={
+              message.author === user?.fullName ? "flex-end" : "flex-start"
+            }
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <HStack>
+              <VStack align="start">
+                <Text
+                  fontSize="sm"
+                  fontWeight="bold"
+                  color={message.author === user?.fullName ? "black" : "white"}
+                >
+                  {message.author}
+                </Text>
+                <Text
+                  color={message.author === user?.fullName ? "black" : "white"}
+                >
+                  {message.body}
+                </Text>
+                <Text
+                  fontSize="xs"
+                  mt={1}
+                  color={
+                    message.author === user?.fullName ? "gray.700" : "gray.300"
+                  }
+                >
+                  {new Date(message._creationTime).toLocaleTimeString()}
+                </Text>
+              </VStack>
+              {/* Speaker Icon for Text-to-Speech */}
+              <IconButton
+                aria-label="Play message"
+                icon={<FiVolume2 />}
+                onClick={() => speakMessage(message.body)}
+                colorScheme="teal"
+                variant="ghost"
+              />
+            </HStack>
             alignSelf={message.author === (user?.fullName) ? "flex-end" : "flex-start"}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -112,6 +187,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ roomId }) => {
         />
         <Button
           colorScheme="blue"
+          onClick={handleSendMessage}
           onClick={() => {handleSendMessage(therapistName ?? "AI Therapist")}}
           rightIcon={<FiSend />}
         >

@@ -17,7 +17,7 @@ function Chats() {
   const user = useQuery(api.users.getUser);
   const [roomName, setRoomName] = useState("TestRoom");
   const [patient, setPatient] = useState("Purav Patel");
-  const [therapist, setTherapist] = useState("Therapist 1");
+  const [therapist, setTherapist] = useState("AI Therapist");
 
   // Handler for creating a room
   const handleCreateRoom = async () => {
@@ -54,7 +54,7 @@ function Chats() {
         shadow="lg"
         align="start"
       >
-        <Text fontSize="xl" fontWeight="bold" color="gray.200">
+        <Text alignSelf="center" fontSize="xl" fontWeight="bold" color="gray.200">
           Therapists
         </Text>
         <Menu>
@@ -82,7 +82,8 @@ function Chats() {
       {/* Right Side: Chat Room */}
       <Flex flexGrow={1} p={6} direction="column">
         {selectedRoom ? (
-          <ChatRoom roomId={selectedRoom} />
+             <ChatRoom roomId={selectedRoom} />
+
         ) : (
           <Text mt={4} textAlign="center" fontSize="xl" color="gray.300">
             Please select a room to start chatting.

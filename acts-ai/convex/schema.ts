@@ -19,6 +19,5 @@ export default defineSchema({
     profile: v.record(v.string(), v.string()),
     userType: v.string(),
     tokenIdentifier: v.string(),
-  }).index("by_token", ["tokenIdentifier"]),
+  }).index("by_token", ["tokenIdentifier"])
 });
-

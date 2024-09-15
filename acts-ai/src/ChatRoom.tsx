@@ -43,15 +43,15 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ roomId }) => {
           
           // Convert the simplified messages to a JSON string
         let stringifiedMessages = JSON.stringify(simplifiedMessages);
-
-        await sendAIMessage({
+        setNewMessage("");
+        const response = await sendAIMessage({
             roomID: roomId,
             messages: stringifiedMessages,
             lastMessage: lastMessage,
             email: user?.primaryEmailAddress?.toString() ?? ""
         });
+        if (response.msg == "THERAPIST_REQUEST") console.log(response.content)
     }
-      setNewMessage("");
     }
   };
 

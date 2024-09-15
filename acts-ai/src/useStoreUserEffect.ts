@@ -1,5 +1,5 @@
 import { useUser } from "@clerk/clerk-react";
-import { useConvexAuth } from "convex/react";
+import { useConvexAuth, useQuery } from "convex/react";
 import { useEffect, useState } from "react";
 import { useMutation } from "convex/react";
 import { api } from "../convex/_generated/api";
@@ -12,6 +12,9 @@ export function useStoreUserEffect() {
   // has stored the user.
   const [userId, setUserId] = useState<Id<"users"> | null>(null);
   const storeUser = useMutation(api.users.store);
+  const createRoom = useMutation(api.rooms.createRoom)  
+  const currUser = useQuery(api.users.getUser);
+
   // Call the `storeUser` mutation function to store
   // the current user in the `users` table and return the `Id` value.
   useEffect(() => {
@@ -25,8 +28,11 @@ export function useStoreUserEffect() {
     async function createUser() {
       const id = await storeUser();
       setUserId(id);
+      let name = currUser?.name ?? ""
+      createRoom({roomName: "AI Therapist", patient: name, therapist: "AI Therapist", notes: []})
     }
     createUser();
+    
     return () => setUserId(null);
     // Make sure the effect reruns if the user logs in with
     // a different identity

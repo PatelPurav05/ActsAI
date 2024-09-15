@@ -5,8 +5,10 @@ import { api } from "../convex/_generated/api";
 import ChatRoom from "./ChatRoom";
 import { Box, Button, Menu, MenuButton, MenuItem, MenuList, Flex, Text, VStack, HStack } from "@chakra-ui/react";
 import { ChevronDownIcon } from "@chakra-ui/icons";
+import { useStoreUserEffect } from "./useStoreUserEffect";
 
 function Chats() {
+  
   const rooms = useQuery(api.rooms.getRoomsForCurrUser); // Fetch rooms
   const [selectedRoom, setSelectedRoom] = useState<Id<"rooms"> | null>(null);
   const [selectedTherapist, setSelectedTherapist] = useState<string | null>(null);
@@ -41,9 +43,11 @@ function Chats() {
       setSelectedPatient(rooms[0].patient)
     }
   }, [rooms, selectedRoom]);
+  const { isLoading, isAuthenticated } = useStoreUserEffect();
 
   return (
-    <div className="w-screen">
+    <div className=" w-100">
+    {isAuthenticated ?
     <Flex height="100vh" bg="gray.900">
       {/* Left Side: Room Selection */}
       <VStack
@@ -91,6 +95,7 @@ function Chats() {
         )}
       </Flex>
     </Flex>
+ : <></>}
     </div>
   );
 }

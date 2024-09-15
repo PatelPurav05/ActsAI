@@ -4,11 +4,15 @@ import actsLogo from "./acts.png";
 import WellnessPage from "./wellness";
 import EmergencyContact from "./contact";
 import { useState } from "react";
+import Chats from "./Chats";
+import { useStoreUserEffect } from "./useStoreUserEffect";
 
 export default function Component() {
   const [currentPage, setCurrentPage] = useState("home");
+ 
 
   const renderPage = () => {
+    
     switch (currentPage) {
       case "home":
         return (
@@ -23,6 +27,8 @@ export default function Component() {
         return <WellnessPage />;
       case "contact":
         return <EmergencyContact />;
+      case "AI Therapist":
+        return <Chats />
       default:
         return null;
     }
@@ -40,7 +46,7 @@ export default function Component() {
             <div className="flex items-center space-x-6">
               <Unauthenticated>
                 <SignInButton mode="modal">
-                  <button className="bg-primary text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-primary-dark transition">
+                  <button className="bg-primary text-black px-4 py-2 rounded-md text-sm font-medium hover:bg-primary-dark transition">
                     Sign In
                   </button>
                 </SignInButton>
@@ -50,7 +56,7 @@ export default function Component() {
               </Authenticated>
               <ul className="flex items-center space-x-6">
                 <li><a href="#" onClick={() => setCurrentPage("home")} className="hover:text-primary">Home</a></li>
-                <li><a href="#" className="hover:text-primary">AI Therapist</a></li>
+                <li><a href="#" onClick={() => setCurrentPage("AI Therapist")}className="hover:text-primary">AI Therapist</a></li>
                 <li><a href="#" onClick={() => setCurrentPage("wellness")} className="hover:text-primary">Wellness</a></li>
                 <li><a href="#" onClick={() => setCurrentPage("contact")} className="hover:text-primary text-red-500 font-semibold">Emergency Contact</a></li>
 
@@ -60,7 +66,7 @@ export default function Component() {
         </nav>
       </header>
       
-      <main className="container mx-auto px-4 py-12">
+      <main className="container mx-auto ">
         {renderPage()}
       </main>
       

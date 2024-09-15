@@ -48,29 +48,31 @@ function Chats() {
   return (
     <div className=" w-100">
     {isAuthenticated ?
-    <Flex height="100vh" bg="gray.900">
+    <Flex height="100vh" bg="white">
       {/* Left Side: Room Selection */}
       <VStack
         w="250px"
-        bg="gray.800"
+        h="150px"
+        bg="white"
         p={4}
+        mt={6}
         spacing={6}
         shadow="lg"
         align="start"
       >
-        <Text alignSelf="center" fontSize="xl" fontWeight="bold" color="gray.200">
-          {user?.userType === "patient" ? "Therapists" :  "Patients"}
+        <Text alignSelf="center" fontSize="xl" fontWeight="bold" color="black">
+          {user?.userType === "patient" ? "THERAPISTS" :  "PATIENTS"}
         </Text>
         <Menu>
           <MenuButton as={Button} rightIcon={<ChevronDownIcon />} colorScheme="blue" w="full">
             {(user?.userType === "patient" ? (selectedTherapist ? `${selectedTherapist}` : "Select a Therapist") : (selectedPatient ? `${selectedPatient}`: "Select a Patient"))}
           </MenuButton>
-          <MenuList bg="gray.800">
+          <MenuList bg="gray.600">
             {rooms?.map((room) => (
               <MenuItem
                 key={room._id}
                 onClick={() => {setSelectedRoom(room._id); setSelectedPatient(room.patient); setSelectedTherapist(room.therapist)}}
-                bg="gray.700"
+                bg="gray.300"
                 _hover={{ bg: "blue.500", color: "white" }}
               >
                 {user?.userType === "patient"? room.therapist: room.patient}
@@ -78,9 +80,9 @@ function Chats() {
             ))}
           </MenuList>
         </Menu>
-        <Button onClick={handleCreateRoom}>
+        {/* <Button onClick={handleCreateRoom}>
             Create Chat
-          </Button>
+          </Button> */}
       </VStack>
 
       {/* Right Side: Chat Room */}

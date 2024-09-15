@@ -35,17 +35,17 @@ def intent(context: str) -> dict:
 def respond_to_chat(context: str) -> str:
     """Responds to a chat message."""
     detected_intent = intent.remote(context=context)
-    user_keywords = []
+    user_keywords = ""
     if 'sad' in context:
-        user_keywords.append('Depression')
+        user_keywords+='Depression, '
     if 'stress' in context or 'worried' in context or 'anxious' in context:
-        user_keywords.append('Anxiety')
+        user_keywords+='Anxiety, '
     if 'anger' in context:
-        user_keywords.append('Anger')
+        user_keywords+='Anger, '
     if 'relationship' in context:
-        user_keywords.append('Relationships')
+        user_keywords+='Relationships, '
     if 'school' in context or 'class' in context or 'grade' in context or 'job' in context or 'career' in context:
-        user_keywords.append('Career Counseling')
+        user_keywords+='Career Counseling, '
     match detected_intent.get("intent"):
         case Intent.CONVERSATION.value:
             # build a respond to chat function.
@@ -74,7 +74,7 @@ def main():
     # print(respond_to_chat("whats the weather like today?"))
 
     # Define the URL
-    url = "https://devanshusp--example-hello-world-respond-to-chat.modal.run"
+    url = "https://sn82978--example-hello-world-respond-to-chat.modal.run"
     params = {"context": "hi"}
     response = requests.get(url, params=params, timeout=10)
     print(response)

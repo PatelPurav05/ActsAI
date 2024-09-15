@@ -62,14 +62,14 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ roomId }) => {
 
   return (
     
-    <Flex direction="column" h="100%" bgGradient="linear(to-r, teal.500, blue.500)" // Gradient background
+    <Flex direction="column" h="100%" // Gradient background
     p={6} rounded="lg" shadow="md">
       {/* Messages Section */}
       <VStack
         spacing={4}
         overflowY="auto"
         flexGrow={1}
-        bg="gray.900"
+        bg="#b4c8bd"
         p={4}
         rounded="lg"
       >
@@ -78,7 +78,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ roomId }) => {
           <Box
             key={message._id}
             as={motion.div}
-            bg={message.author === (user?.fullName) ? "blue.500" : "gray.700"}
+            bg={message.author === (user?.fullName) ? "gray.300" : "gray.700"}
             color="white"
             p={3}
             rounded="lg"
@@ -86,11 +86,11 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ roomId }) => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <Text fontSize="sm" fontWeight="bold">
+            <Text fontSize="sm" fontWeight="bold" color={message.author === (user?.fullName) ? "black" : "white"}>
               {message.author}
             </Text>
-            <Text>{message.body}</Text>
-            <Text fontSize="xs" mt={1} color="gray.400">
+            <Text color={message.author === (user?.fullName) ? "black" : "white"}>{message.body}</Text>
+            <Text fontSize="xs" mt={1} color={message.author === (user?.fullName) ? "gray.700" : "gray.300"}>
               {new Date(message._creationTime).toLocaleTimeString()}
             </Text>
           </Box>

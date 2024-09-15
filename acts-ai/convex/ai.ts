@@ -4,27 +4,26 @@ import { v } from "convex/values";
 
 export const chat = action({
   args: {
-    roomID: v.id("rooms"),
-    messages: v.array(v.string())
+    roomID: v.id("rooms"), // Validate room ID as an ID of "rooms"
+    messages: v.string(), // Validate messages as an array of strings
+    lastMessage: v.string(),
+    email: v.string(), // Add the email field and validate it as a string
   },
   handler: async (ctx, args) => {
-    // Convert context to a query parameter string (URL encoding is required for safe transmission)
-    const context = encodeURIComponent(args.messages.toString());
-
-    // Construct the URL with the query parameters
-    const url = `https://devanshusp--example-hello-world-respond-to-chat.modal.run?context=${context}`;
+    // Get the last message in the array
+    // Convert context (messages) to a query parameter string (URL encoding is required)    // Construct the URL with the query parameters
+    const url = `https://devanshusp--example-hello-world-respond-to-chat.modal.run?context=${args.messages}&user_email=${encodeURIComponent(args.email)}&user_message=${encodeURIComponent(args.lastMessage)})}`;
 
     // Send the GET request
     const res = await fetch(url, {
       method: "GET",
     });
-    // Parse the JSON response
-    // const json = await res.json();
-    const string = await res.text()
 
-    // Pull the message content out of the response
-    const messageContent = string || "Sorry, I don't have an answer for that.";
-    console.log(messageContent)
+    console.log(res)
+
+    // Parse the response (assuming text format, but change as needed)
+    const messageContent = (await res.text()) || "Sorry, I don't have an answer for that.";
+    console.log(messageContent);
 
     // Send AI's response as a new message
     await ctx.runMutation(api.messages.sendMessage, {
@@ -34,6 +33,9 @@ export const chat = action({
     });
   },
 });
+
+
+  
 
 interface Message {
     roomId: Id<"rooms">;

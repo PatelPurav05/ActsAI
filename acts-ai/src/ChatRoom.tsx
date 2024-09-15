@@ -16,26 +16,41 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ roomId }) => {
   const sendMessage = useMutation(api.messages.sendMessage);
   const sendAIMessage = useAction(api.ai.chat)
   const { user } = useUser(); // Fetch the current user's information using Clerk
+  const currUser = useQuery(api.users.getUser);
   const getAllMessages = useQuery(api.ai.getMessagesForPatient, {userID: user?.fullName ?? ""})
   const [newMessage, setNewMessage] = useState<string>("");
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  const handleSendMessage = async () => {
+  const roomData = useQuery(api.rooms.getRoomById, { roomId });
+  
+  const therapistName = roomData?.therapist; // Extract therapist's name or ID
+
+  const handleSendMessage = async (userName: string) => {
     if (newMessage.trim()) {
       await sendMessage({
         roomId,
         body: newMessage,
         author: user?.fullName ?? "Anonymous", // Ensure author is always a string
     });
-      let messages = await getAllMessages ?? []; //past 10 msgs
-      console.log(messages)
-      const formattedMessages: string[] = messages.map((msg) => (
-        msg.author + ": (" + msg.body + ")" + "\n"
-      ));
-      await sendAIMessage({
-        roomID: roomId,
-        messages: formattedMessages
-      });
+    if (userName === "AI Therapist"){
+        let messages = await getAllMessages ?? []; //past 10 msgs
+        let lastMessage = newMessage
+        let allButLastMsg = messages.slice(0, -1)
+        let simplifiedMessages = allButLastMsg.map((msg) => ({
+            author: msg.author,
+            body: msg.body,
+          }));
+          
+          // Convert the simplified messages to a JSON string
+        let stringifiedMessages = JSON.stringify(simplifiedMessages);
+
+        await sendAIMessage({
+            roomID: roomId,
+            messages: stringifiedMessages,
+            lastMessage: lastMessage,
+            email: user?.primaryEmailAddress?.toString() ?? ""
+        });
+    }
       setNewMessage("");
     }
   };
@@ -96,7 +111,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ roomId }) => {
         />
         <Button
           colorScheme="blue"
-          onClick={handleSendMessage}
+          onClick={() => {handleSendMessage(therapistName ?? "AI Therapist")}}
           rightIcon={<FiSend />}
         >
           Send

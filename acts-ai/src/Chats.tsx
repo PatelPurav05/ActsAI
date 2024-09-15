@@ -17,7 +17,7 @@ function Chats() {
   const user = useQuery(api.users.getUser);
   const [roomName, setRoomName] = useState("TestRoom");
   const [patient, setPatient] = useState("Purav Patel");
-  const [therapist, setTherapist] = useState("AI Therapist");
+  const [therapist, setTherapist] = useState("Therapist 1");
 
   // Handler for creating a room
   const handleCreateRoom = async () => {
@@ -55,7 +55,7 @@ function Chats() {
         align="start"
       >
         <Text alignSelf="center" fontSize="xl" fontWeight="bold" color="gray.200">
-          Therapists
+          {user?.userType === "patient" ? "Therapists" :  "Patients"}
         </Text>
         <Menu>
           <MenuButton as={Button} rightIcon={<ChevronDownIcon />} colorScheme="blue" w="full">
@@ -65,7 +65,7 @@ function Chats() {
             {rooms?.map((room) => (
               <MenuItem
                 key={room._id}
-                onClick={() => setSelectedRoom(room._id)}
+                onClick={() => {setSelectedRoom(room._id); setSelectedPatient(room.patient); setSelectedTherapist(room.therapist)}}
                 bg="gray.700"
                 _hover={{ bg: "blue.500", color: "white" }}
               >

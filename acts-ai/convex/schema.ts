@@ -15,6 +15,7 @@ export default defineSchema({
   }),
   users: defineTable({
     name: v.string(),
+    email: v.string(),
     profile: v.record(v.string(), v.string()),
     userType: v.string(),
     tokenIdentifier: v.string(),

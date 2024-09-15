@@ -1,3 +1,4 @@
+import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 
 // Fetch all rooms
@@ -29,3 +30,10 @@ export const createRoom = mutation(async ({ db }, { roomName, patient, therapist
   };
   await db.insert("rooms", room);
 });
+
+export const getRoomById = query({
+    args: { roomId: v.id("rooms") },
+    handler: async (ctx, { roomId }) => {
+      return await ctx.db.get(roomId);
+    },
+  });

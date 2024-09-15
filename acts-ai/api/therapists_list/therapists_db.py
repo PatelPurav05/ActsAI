@@ -28,7 +28,7 @@ def get_therapists(query: list[str]):
         client.delete_collection(name=collection_name)
         # print(f"COLLECTION {collection_name} DELETED")
     except:
-        # print(f"COLLECTION {collection_name} DIDNT EXIST YET")
+        print(f"COLLECTION {collection_name} DIDNT EXIST YET")
 
     collection = client.create_collection(
         name=collection_name,

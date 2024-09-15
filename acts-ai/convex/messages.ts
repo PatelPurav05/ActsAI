@@ -1,4 +1,6 @@
-import { query } from "./_generated/server";
+import { query, mutation } from "./_generated/server";
+import { v } from "convex/values";
+import { Id } from "./_generated/dataModel"; // Import the Id type
 
 export const getForCurrentUser = query({
   args: {},

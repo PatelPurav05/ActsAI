@@ -5,6 +5,7 @@ import actsLogo from "./acts.png";
 import "./newindex.css";
 import { SignInButton, SignOutButton } from "@clerk/clerk-react";
 import { Authenticated, Unauthenticated } from "convex/react";
+import { Authenticated } from "convex/react";
 
 export default function EmergencyContact() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -34,12 +35,14 @@ export default function EmergencyContact() {
             >
               Home
             </a>
-            <a
-              href="/Chats"
-              className="text-gray-600 hover:text-green-700 transition-colors"
-            >
-              AI Therapist
-            </a>
+            <Authenticated>
+              <a
+                href="/chats"
+                className="text-gray-600 hover:text-green-700 transition-colors"
+              >
+                AI Therapist
+              </a>
+            </Authenticated>
             <a
               href="/wellness"
               className="text-gray-600 hover:text-green-700 transition-colors"
@@ -76,12 +79,14 @@ export default function EmergencyContact() {
               >
                 Home
               </a>
+              <Authenticated>
               <a
-                href="/Chats"
+                href="/chats"
                 className="text-gray-600 hover:text-green-700 transition-colors"
               >
                 AI Therapist
               </a>
+              </Authenticated>
               <a
                 href="/wellness"
                 className="text-gray-600 hover:text-green-700 transition-colors"

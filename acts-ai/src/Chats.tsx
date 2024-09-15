@@ -16,6 +16,7 @@ import {
 } from "@chakra-ui/react";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import { useStoreUserEffect } from "./useStoreUserEffect";
+import Navbar from "./Navbar";
 
 function Chats() {
   const [retryCount, setRetryCount] = useState(0);
@@ -73,6 +74,10 @@ function Chats() {
   }
 
   return (
+    <div><Navbar />
+    <div className=" w-100 mx-10">
+    
+    {isAuthenticated ?
     <Flex height="100vh" bg="white">
       <VStack w="250px" bg="gray.100" p={4} spacing={4}>
         <Text fontSize="xl" fontWeight="bold">
@@ -104,6 +109,9 @@ function Chats() {
         )}
       </Flex>
     </Flex>
+ : <></>}
+    </div>
+    </div>
   );
 }
 

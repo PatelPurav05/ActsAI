@@ -7,7 +7,7 @@ const Therapist: React.FC = () => {
   >([]);
   const [input, setInput] = useState("");
   const chatEndRef = useRef<HTMLDivElement>(null);
-  const sendMessage = useMutation("sendMessage"); // Replace with your actual Convex mutation
+  const sendMessage = useMutation("sendMessage" as any); // Replace with your actual Convex mutation
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
